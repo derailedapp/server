@@ -14,11 +14,19 @@
    limitations under the License.
 */
 
-pub mod posts;
-pub mod users;
+use axum::routing::{get, post};
+
+pub mod create;
+pub mod delete;
+pub mod get_thread;
+pub mod get_user;
 
 pub fn router() -> axum::Router<crate::GSt> {
     axum::Router::new()
-        .merge(users::router())
-        .merge(posts::router())
+        .route("/users/:user_id/posts", get(get_user::route))
+        .route("/posts", post(create::route))
+        .route(
+            "/posts/:post_id",
+            get(get_thread::route).delete(delete::route),
+        )
 }

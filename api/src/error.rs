@@ -29,6 +29,10 @@ pub enum Error {
 
     #[error("Internal Server Error")]
     #[status(500)]
+    VodoError2(#[from] vodozemac::PickleError),
+
+    #[error("Internal Server Error")]
+    #[status(500)]
     ToStrError(#[from] ToStrError),
 
     #[error("Internal Server Error")]
@@ -62,4 +66,8 @@ pub enum Error {
     #[error("User not found")]
     #[status(404)]
     UserNotFound,
+
+    #[error("Post does not exist")]
+    #[status(404)]
+    PostNotExist,
 }

@@ -14,11 +14,23 @@
    limitations under the License.
 */
 
-pub mod posts;
-pub mod users;
+use axum::{
+    Json,
+    extract::{Path, State},
+};
+use bevy_db::Post;
 
-pub fn router() -> axum::Router<crate::GSt> {
-    axum::Router::new()
-        .merge(users::router())
-        .merge(posts::router())
+pub async fn route(
+    State(state): State<crate::GSt>,
+    Path(other_user): Path<String>,
+) -> Result<Json<Vec<Post>>, crate::Error> {
+    Ok(Json(
+        sqlx::query_as!(
+            Post,
+            "SELECT * FROM posts WHERE author_id = $1 ORDER BY indexed_ts DESC;",
+            other_user
+        )
+        .fetch_all(&state.pg)
+        .await?,
+    ))
 }
