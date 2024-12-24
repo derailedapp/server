@@ -50,4 +50,12 @@ pub enum Error {
     #[error("Invalid email or password")]
     #[status(401)]
     Argon2Error,
+
+    #[error("User already followed")]
+    #[status(400)]
+    UserFollowed,
+
+    #[error("User not followed")]
+    #[status(400)]
+    UserNotFollowed,
 }

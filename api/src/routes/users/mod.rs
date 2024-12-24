@@ -15,12 +15,39 @@
 */
 
 use axum::routing::post;
+use sqlx::PgPool;
 
+pub mod follow;
 pub mod login;
 pub mod register;
+pub mod unfollow;
+
+pub async fn follow_exists(
+    db: &PgPool,
+    follower: &str,
+    followee: &str,
+) -> Result<bool, crate::Error> {
+    if sqlx::query!(
+        "SELECT since FROM follows WHERE follower_id = $1 AND followee_id = $2",
+        follower,
+        followee
+    )
+    .fetch_optional(db)
+    .await?
+    .is_some()
+    {
+        Ok(true)
+    } else {
+        Ok(false)
+    }
+}
 
 pub fn router() -> axum::Router<crate::GSt> {
     axum::Router::new()
         .route("/users/create", post(register::route))
         .route("/users/login", post(login::route))
+        .route(
+            "/users/:user_id/follow",
+            post(follow::route).delete(unfollow::route),
+        )
 }
