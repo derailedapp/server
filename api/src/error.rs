@@ -58,4 +58,8 @@ pub enum Error {
     #[error("User not followed")]
     #[status(400)]
     UserNotFollowed,
+
+    #[error("User not found")]
+    #[status(404)]
+    UserNotFound,
 }

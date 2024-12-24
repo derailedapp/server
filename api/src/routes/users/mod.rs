@@ -14,11 +14,12 @@
    limitations under the License.
 */
 
-use axum::routing::post;
+use axum::routing::{get, post};
 use sqlx::PgPool;
 
 pub mod follow;
 pub mod login;
+pub mod profile;
 pub mod register;
 pub mod unfollow;
 
@@ -50,4 +51,5 @@ pub fn router() -> axum::Router<crate::GSt> {
             "/users/:user_id/follow",
             post(follow::route).delete(unfollow::route),
         )
+        .route("/users/:user_id", get(profile::route))
 }
