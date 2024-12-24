@@ -1,0 +1,15 @@
+[workspace]
+resolver = "1"
+members = ["api"]
+
+[workspace.dependencies]
+tokio = { version = "1.42.0", features = ["full"] }
+argon2 = "0.5.3"
+axum = { version = "0.7.9", features = ["ws"] }
+axum_thiserror = "0.1.0"
+jsonwebtoken = "9.3.0"
+lazy_static = "1.5.0"
+regex = "1.11.1"
+serde_valid = "0.25.0"
+sqlx = { version = "0.8.2", features = ["runtime-tokio", "tls-native-tls", "postgres", "macros", "chrono"] }
+thiserror = "2.0.9"

@@ -1,0 +1,17 @@
+[package]
+name = "api"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+tokio.workspace = true
+argon2.workspace = true
+axum.workspace = true
+axum_thiserror.workspace = true
+jsonwebtoken.workspace = true
+lazy_static.workspace = true
+regex.workspace = true
+serde_valid.workspace = true
+sqlx.workspace = true
+thiserror.workspace = true
+tower-http = {version = "0.6.2", features = ["cors"]}
