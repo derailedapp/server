@@ -15,3 +15,8 @@ serde_valid.workspace = true
 sqlx.workspace = true
 thiserror.workspace = true
 tower-http = {version = "0.6.2", features = ["cors"]}
+dotenvy = "0.15.7"
+serde.workspace = true
+bevy_db.workspace = true
+vodozemac = "0.8.1"
+nanoid = "0.4.0"

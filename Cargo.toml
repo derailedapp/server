@@ -1,6 +1,6 @@
 [workspace]
 resolver = "1"
-members = ["api"]
+members = ["api", "bevy_db"]
 
 [workspace.dependencies]
 tokio = { version = "1.42.0", features = ["full"] }
@@ -13,3 +13,6 @@ regex = "1.11.1"
 serde_valid = "0.25.0"
 sqlx = { version = "0.8.2", features = ["runtime-tokio", "tls-native-tls", "postgres", "macros", "chrono"] }
 thiserror = "2.0.9"
+serde = { version = "1.0.216", features = ["derive"] }
+
+bevy_db = { path = "./bevy_db" }

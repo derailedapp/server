@@ -7,18 +7,17 @@ CREATE TABLE IF NOT EXISTS actors (
     public_key TEXT NOT NULL
 );
 CREATE TABLE IF NOT EXISTS follows (
-    follower TEXT NOT NULL REFERENCES actors(id),
-    followee TEXT NOT NULL REFERENCES actors(id),
+    follower_id TEXT NOT NULL REFERENCES actors(id),
+    followee_id TEXT NOT NULL REFERENCES actors(id),
     since BIGINT NOT NULL,
-    PRIMARY KEY (follower, followee)
+    PRIMARY KEY (follower_id, followee_id)
 );
 CREATE TABLE IF NOT EXISTS accounts (
     id TEXT NOT NULL PRIMARY KEY REFERENCES actors(id) ON DELETE CASCADE,
-    email TEXT NOT NULL UNIQUE,
+    email TEXT UNIQUE,
     password TEXT NOT NULL,
     admin BOOLEAN NOT NULL DEFAULT false,
     theme TEXT NOT NULL,
-    ed_key TEXT NOT NULL,
     pickle TEXT NOT NULL
 );
 CREATE TABLE IF NOT EXISTS sessions (
