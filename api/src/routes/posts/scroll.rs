@@ -14,21 +14,29 @@
    limitations under the License.
 */
 
-use axum::routing::{get, post};
+use axum::{
+    Json,
+    extract::{Query, State},
+};
+use bevy_db::Post;
+use serde::Deserialize;
 
-pub mod create;
-pub mod delete;
-pub mod get_thread;
-pub mod get_user;
-pub mod scroll;
+#[derive(Deserialize)]
+pub struct ScrollOptions {
+    exclude: Vec<String>,
+}
 
-pub fn router() -> axum::Router<crate::GSt> {
-    axum::Router::new()
-        .route("/users/:user_id/posts", get(get_user::route))
-        .route("/posts", post(create::route))
-        .route(
-            "/posts/:post_id",
-            get(get_thread::route).delete(delete::route),
+pub async fn route(
+    Query(options): Query<ScrollOptions>,
+    State(state): State<crate::GSt>,
+) -> Result<Json<Vec<Post>>, crate::Error> {
+    Ok(Json(
+        sqlx::query_as!(
+            Post,
+            "SELECT * FROM posts WHERE id != ANY($1) ORDER BY indexed_ts;",
+            &options.exclude
         )
-        .route("/posts/scroll", get(scroll::route))
+        .fetch_all(&state.pg)
+        .await?,
+    ))
 }
