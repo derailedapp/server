@@ -16,13 +16,10 @@
 
 use axum::{
     Json,
-    extract::{Path, State},
-    http::HeaderMap,
+    extract::{Path, State}
 };
 use bevy_db::Actor;
 use serde::Serialize;
-
-use crate::auth::get_user;
 
 #[derive(Serialize)]
 pub struct UserProfile {
@@ -33,12 +30,9 @@ pub struct UserProfile {
 }
 
 pub async fn route(
-    map: HeaderMap,
     State(state): State<crate::GSt>,
     Path(other_user): Path<String>,
 ) -> Result<Json<UserProfile>, crate::Error> {
-    let (actor, _) = get_user(&map, &state.key, &state.pg).await?;
-
     let user = sqlx::query_as!(Actor, "SELECT * FROM actors WHERE id = $1;", other_user)
         .fetch_optional(&state.pg)
         .await?;
@@ -65,7 +59,7 @@ pub async fn route(
         .await?;
 
         Ok(Json(UserProfile {
-            actor,
+            actor: user,
             followed: followed_users.count.unwrap_or(0),
             followers: followers.count.unwrap_or(0),
             posts: posts.count.unwrap_or(0),
