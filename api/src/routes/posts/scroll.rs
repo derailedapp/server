@@ -23,6 +23,7 @@ use serde::Deserialize;
 
 #[derive(Deserialize)]
 pub struct ScrollOptions {
+    #[serde(default)]
     exclude: Vec<String>,
 }
 
