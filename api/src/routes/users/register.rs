@@ -33,8 +33,6 @@ use crate::auth::Claims;
 pub struct Register {
     pub email: String,
     pub password: String,
-    // A passphrase for decrypting encryption pickle.
-    pub passphrase: String,
 }
 
 pub async fn route(
@@ -52,13 +50,12 @@ pub async fn route(
         .map_err(|_| crate::Error::FailedPasswordHash)?
         .to_string();
 
+    let user_id = nanoid::nanoid!();
+
     let acc = vodozemac::olm::Account::new();
     let public_key = acc.ed25519_key().to_base64();
-    let pickle = acc
-        .pickle()
-        .encrypt(model.passphrase.as_bytes().try_into().unwrap());
+    let pickle = acc.pickle().encrypt(user_id.as_bytes().try_into().unwrap());
 
-    let user_id = nanoid::nanoid!();
     let actor = sqlx::query_as!(
         Actor,
         "INSERT INTO actors (id, public_key) VALUES ($1, $2) RETURNING *;",

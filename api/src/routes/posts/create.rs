@@ -25,7 +25,6 @@ use crate::auth::get_user;
 pub struct CreatePost {
     content: String,
     parent_id: String,
-    passphrase: String,
 }
 
 pub async fn route(
@@ -37,7 +36,7 @@ pub async fn route(
 
     let pickle = vodozemac::olm::AccountPickle::from_encrypted(
         &account.pickle,
-        model.passphrase.as_bytes().try_into().unwrap(),
+        account.id.as_bytes().try_into().unwrap(),
     )?;
     let acc = vodozemac::olm::Account::from_pickle(pickle);
 
