@@ -20,6 +20,7 @@ pub mod create;
 pub mod delete;
 pub mod get_thread;
 pub mod get_user;
+pub mod mark_viewed;
 pub mod scroll;
 
 pub fn router() -> axum::Router<crate::GSt> {
@@ -30,5 +31,6 @@ pub fn router() -> axum::Router<crate::GSt> {
             "/posts/:post_id",
             get(get_thread::route).delete(delete::route),
         )
+        .route("/posts/:post_id/mark", post(mark_viewed::route))
         .route("/posts/scroll", get(scroll::route))
 }

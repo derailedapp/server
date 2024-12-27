@@ -14,11 +14,7 @@
    limitations under the License.
 */
 
-use axum::{
-    Json,
-    extract::State,
-    http::HeaderMap,
-};
+use axum::{Json, extract::State, http::HeaderMap};
 use bevy_db::Actor;
 use serde::Serialize;
 
@@ -34,7 +30,7 @@ pub struct UserProfile {
 
 pub async fn route(
     map: HeaderMap,
-    State(state): State<crate::GSt>
+    State(state): State<crate::GSt>,
 ) -> Result<Json<UserProfile>, crate::Error> {
     let (actor, _) = get_user(&map, &state.key, &state.pg).await?;
 

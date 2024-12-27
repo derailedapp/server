@@ -19,10 +19,10 @@ use sqlx::PgPool;
 
 pub mod follow;
 pub mod login;
+pub mod me;
 pub mod profile;
 pub mod register;
 pub mod unfollow;
-pub mod me;
 
 pub async fn follow_exists(
     db: &PgPool,
