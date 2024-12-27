@@ -24,7 +24,7 @@ use serde::Deserialize;
 #[derive(Deserialize)]
 pub struct ScrollOptions {
     #[serde(default)]
-    exclude: Vec<String>,
+    before_ts: i64
 }
 
 pub async fn route(
@@ -34,8 +34,8 @@ pub async fn route(
     Ok(Json(
         sqlx::query_as!(
             Post,
-            "SELECT * FROM posts WHERE id != ANY($1) ORDER BY indexed_ts;",
-            &options.exclude
+            "SELECT * FROM posts WHERE indexed_ts < $1 ORDER BY indexed_ts;",
+            &options.before_ts
         )
         .fetch_all(&state.pg)
         .await?,
