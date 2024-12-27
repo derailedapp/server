@@ -1,3 +1,3 @@
-# Bevy Server API
+# Derailed API
 
-Implementation of the HTTP API of the Bevy Protocol.
+A Rust application built with Axum for serving Derailed's API.
