@@ -18,7 +18,7 @@ use axum::{
     Json,
     extract::{Path, State},
 };
-use bevy_db::Post;
+use db_models::Post;
 
 pub async fn route(
     State(state): State<crate::GSt>,

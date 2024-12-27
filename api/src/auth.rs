@@ -15,7 +15,7 @@
 */
 
 use axum::http::HeaderMap;
-use bevy_db::{Account, Actor};
+use db_models::{Account, Actor};
 use jsonwebtoken::{DecodingKey, EncodingKey, Header, Validation, decode, encode};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;

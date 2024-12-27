@@ -18,7 +18,7 @@ use axum::{
     Json,
     extract::{Path, State},
 };
-use bevy_db::Actor;
+use db_models::Actor;
 use serde::Serialize;
 
 #[derive(Serialize)]

@@ -18,7 +18,7 @@ use axum::{
     Json,
     extract::{Path, State},
 };
-use bevy_db::Post;
+use db_models::Post;
 use serde::Serialize;
 
 #[derive(Serialize)]

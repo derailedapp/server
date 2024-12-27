@@ -18,7 +18,7 @@ use std::time::Duration;
 
 use argon2::{Argon2, PasswordVerifier};
 use axum::{Json, extract::State};
-use bevy_db::{Account, Actor, TokenResult};
+use db_models::{Account, Actor, TokenResult};
 use jsonwebtoken::EncodingKey;
 use serde::Deserialize;
 use sqlx::types::chrono;
@@ -34,7 +34,7 @@ pub struct Login {
 pub async fn route(
     State(state): State<crate::GSt>,
     Json(model): Json<Login>,
-) -> Result<Json<bevy_db::TokenResult>, crate::Error> {
+) -> Result<Json<db_models::TokenResult>, crate::Error> {
     let account = sqlx::query_as!(
         Account,
         "SELECT * FROM accounts WHERE email = $1;",

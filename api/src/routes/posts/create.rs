@@ -15,7 +15,7 @@
 */
 
 use axum::{Json, extract::State, http::HeaderMap};
-use bevy_db::Post;
+use db_models::Post;
 use serde::Deserialize;
 use sqlx::types::chrono;
 

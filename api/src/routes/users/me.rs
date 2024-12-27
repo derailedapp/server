@@ -15,7 +15,7 @@
 */
 
 use axum::{Json, extract::State, http::HeaderMap};
-use bevy_db::Actor;
+use db_models::Actor;
 use serde::Serialize;
 
 use crate::auth::get_user;

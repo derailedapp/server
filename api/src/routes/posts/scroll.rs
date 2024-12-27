@@ -18,13 +18,13 @@ use axum::{
     Json,
     extract::{Query, State},
 };
-use bevy_db::Post;
+use db_models::Post;
 use serde::Deserialize;
 
 #[derive(Deserialize)]
 pub struct ScrollOptions {
     #[serde(default)]
-    before_ts: i64
+    before_ts: i64,
 }
 
 pub async fn route(

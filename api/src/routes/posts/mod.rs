@@ -20,8 +20,8 @@ pub mod create;
 pub mod delete;
 pub mod get_thread;
 pub mod get_user;
-pub mod scroll;
 pub mod mark_viewed;
+pub mod scroll;
 
 pub fn router() -> axum::Router<crate::GSt> {
     axum::Router::new()

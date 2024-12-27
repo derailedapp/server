@@ -93,7 +93,7 @@ dependencies = [
  "argon2",
  "axum",
  "axum_thiserror",
- "bevy_db",
+ "db_models",
  "dotenvy",
  "jsonwebtoken",
  "lazy_static",
@@ -270,14 +270,6 @@ name = "base64ct"
 version = "1.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8c3c1a368f70d6cf7302d78f8f7093da241fb8e8807c05cc9e51a125895a6d5b"
-
-[[package]]
-name = "bevy_db"
-version = "0.1.0"
-dependencies = [
- "serde",
- "sqlx",
-]
 
 [[package]]
 name = "bitflags"
@@ -518,6 +510,14 @@ name = "data-encoding"
 version = "2.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e8566979429cf69b49a5c740c60791108e86440e8be149bbea4fe54d2c32d6e2"
+
+[[package]]
+name = "db_models"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "sqlx",
+]
 
 [[package]]
 name = "der"
