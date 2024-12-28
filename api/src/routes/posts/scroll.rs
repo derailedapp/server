@@ -20,22 +20,24 @@ use axum::{
 };
 use db_models::Post;
 use serde::Deserialize;
+use sqlx::types::chrono;
 
 #[derive(Deserialize)]
 pub struct ScrollOptions {
     #[serde(default)]
-    before_ts: i64,
+    before_ts: Option<i64>,
 }
 
 pub async fn route(
     Query(options): Query<ScrollOptions>,
     State(state): State<crate::GSt>,
 ) -> Result<Json<Vec<Post>>, crate::Error> {
+    let ts = chrono::Utc::now().timestamp_millis();
     Ok(Json(
         sqlx::query_as!(
             Post,
             "SELECT * FROM posts WHERE indexed_ts < $1 ORDER BY indexed_ts;",
-            &options.before_ts
+            &options.before_ts.unwrap_or(ts)
         )
         .fetch_all(&state.pg)
         .await?,
