@@ -24,7 +24,8 @@ use crate::auth::get_user;
 #[derive(Deserialize)]
 pub struct CreatePost {
     content: String,
-    parent_id: String,
+    #[serde(default)]
+    parent_id: Option<String>,
 }
 
 pub async fn route(
@@ -36,7 +37,7 @@ pub async fn route(
 
     let pickle = vodozemac::olm::AccountPickle::from_encrypted(
         &account.pickle,
-        account.id.as_bytes().try_into().unwrap(),
+        &crate::PICKLE_KEY,
     )?;
     let acc = vodozemac::olm::Account::from_pickle(pickle);
 
@@ -47,6 +48,7 @@ pub async fn route(
 
     let sig = acc.sign(sig_fmt).to_base64();
 
+    // TODO: verify post id and return a prompt error
     Ok(Json(sqlx::query_as!(
         Post,
         "INSERT INTO posts (id, type, author_id, content, original_ts, indexed_ts, parent_id, signature) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *;",

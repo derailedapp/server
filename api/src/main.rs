@@ -34,6 +34,8 @@ pub struct GSt {
     pub key: String,
 }
 
+pub const PICKLE_KEY: [u8; 32] = [0u8; 32];
+
 #[tokio::main]
 async fn main() {
     dotenvy::dotenv().unwrap();

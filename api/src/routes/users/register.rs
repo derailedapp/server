@@ -54,7 +54,7 @@ pub async fn route(
 
     let acc = vodozemac::olm::Account::new();
     let public_key = acc.ed25519_key().to_base64();
-    let pickle = acc.pickle().encrypt(user_id.as_bytes().try_into().unwrap());
+    let pickle = acc.pickle().encrypt(&crate::PICKLE_KEY);
 
     let actor = sqlx::query_as!(
         Actor,
@@ -73,7 +73,7 @@ pub async fn route(
         &session_id,
         &actor.id
     )
-    .execute(&state.pg)
+    .execute(&mut *tx)
     .await?;
 
     tx.commit().await?;
