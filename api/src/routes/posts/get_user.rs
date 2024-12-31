@@ -18,19 +18,28 @@ use axum::{
     Json,
     extract::{Path, State},
 };
-use db_models::Post;
+use db_models::{Post, Thread};
+
+use crate::utils::get_thread;
 
 pub async fn route(
     State(state): State<crate::GSt>,
     Path(other_user): Path<String>,
-) -> Result<Json<Vec<Post>>, crate::Error> {
+) -> Result<Json<Vec<Thread>>, crate::Error> {
     Ok(Json(
-        sqlx::query_as!(
-            Post,
-            "SELECT * FROM posts WHERE author_id = $1 ORDER BY indexed_ts DESC;",
-            other_user
+        futures::future::join_all(
+            sqlx::query_as!(
+                Post,
+                "SELECT * FROM posts WHERE author_id = $1 ORDER BY indexed_ts DESC;",
+                other_user
+            )
+            .fetch_all(&state.pg)
+            .await?
+            .into_iter()
+            .map(|post| get_thread(&state.pg, post, false)),
         )
-        .fetch_all(&state.pg)
-        .await?,
+        .await
+        .into_iter()
+        .collect::<Result<Vec<Thread>, crate::Error>>()?,
     ))
 }
