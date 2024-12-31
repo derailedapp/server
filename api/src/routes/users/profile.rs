@@ -18,16 +18,9 @@ use axum::{
     Json,
     extract::{Path, State},
 };
-use db_models::Actor;
-use serde::Serialize;
+use db_models::{Actor, UserProfile};
 
-#[derive(Serialize)]
-pub struct UserProfile {
-    actor: Actor,
-    followed: i64,
-    followers: i64,
-    posts: i64,
-}
+use crate::utils::get_profile;
 
 pub async fn route(
     State(state): State<crate::GSt>,
@@ -38,32 +31,7 @@ pub async fn route(
         .await?;
 
     if let Some(user) = user {
-        // fetch metadata
-        let followed_users = sqlx::query!(
-            "SELECT COUNT(followee_id) FROM follows WHERE follower_id = $1;",
-            &user.id
-        )
-        .fetch_one(&state.pg)
-        .await?;
-        let followers = sqlx::query!(
-            "SELECT COUNT(follower_id) FROM follows WHERE followee_id = $1;",
-            &user.id
-        )
-        .fetch_one(&state.pg)
-        .await?;
-        let posts = sqlx::query!(
-            "SELECT COUNT(id) FROM posts WHERE author_id = $1;",
-            &user.id
-        )
-        .fetch_one(&state.pg)
-        .await?;
-
-        Ok(Json(UserProfile {
-            actor: user,
-            followed: followed_users.count.unwrap_or(0),
-            followers: followers.count.unwrap_or(0),
-            posts: posts.count.unwrap_or(0),
-        }))
+        Ok(Json(get_profile(&state.pg, user).await?))
     } else {
         Err(crate::Error::UserNotFound)
     }

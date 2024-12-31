@@ -19,11 +19,13 @@
 mod auth;
 mod error;
 mod routes;
+mod utils;
 
 use error::Error;
 use std::{env, time::Duration};
 
 use axum::http::Method;
+use mimalloc::MiMalloc;
 use sqlx::{PgPool, postgres::PgPoolOptions};
 use tokio::net::TcpListener;
 use tower_http::cors::{Any, CorsLayer};
@@ -35,6 +37,9 @@ pub struct GSt {
 }
 
 pub const PICKLE_KEY: [u8; 32] = [0u8; 32];
+
+#[global_allocator]
+static GLOBAL: MiMalloc = MiMalloc;
 
 #[tokio::main]
 async fn main() {

@@ -18,14 +18,9 @@ use axum::{
     Json,
     extract::{Path, State},
 };
-use db_models::Post;
-use serde::Serialize;
+use db_models::{Post, Thread};
 
-#[derive(Serialize)]
-pub struct Thread {
-    parent: Post,
-    children: Vec<Post>,
-}
+use crate::utils::get_thread;
 
 pub async fn route(
     State(state): State<crate::GSt>,
@@ -36,14 +31,7 @@ pub async fn route(
         .await?;
 
     if let Some(post) = post {
-        let children = sqlx::query_as!(Post, "SELECT * FROM posts WHERE parent_id = $1;", &post.id)
-            .fetch_all(&state.pg)
-            .await?;
-
-        Ok(Json(Thread {
-            parent: post,
-            children,
-        }))
+        Ok(Json(get_thread(&state.pg, post, true).await?))
     } else {
         Err(crate::Error::PostNotExist)
     }

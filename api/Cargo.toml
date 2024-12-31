@@ -20,3 +20,5 @@ serde.workspace = true
 db_models.workspace = true
 vodozemac = "0.8.1"
 nanoid = "0.4.0"
+futures = "0.3.31"
+mimalloc = { version = "*", features = ["secure"] }

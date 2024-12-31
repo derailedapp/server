@@ -35,10 +35,8 @@ pub async fn route(
 ) -> Result<Json<Post>, crate::Error> {
     let (actor, account) = get_user(&map, &state.key, &state.pg).await?;
 
-    let pickle = vodozemac::olm::AccountPickle::from_encrypted(
-        &account.pickle,
-        &crate::PICKLE_KEY,
-    )?;
+    let pickle =
+        vodozemac::olm::AccountPickle::from_encrypted(&account.pickle, &crate::PICKLE_KEY)?;
     let acc = vodozemac::olm::Account::from_pickle(pickle);
 
     let id = nanoid::nanoid!();

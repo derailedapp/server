@@ -32,6 +32,14 @@ pub struct Account {
     pub pickle: String,
 }
 
+#[derive(Serialize, Deserialize, Clone)]
+pub struct UserProfile {
+    pub actor: Actor,
+    pub followed: i64,
+    pub followers: i64,
+    pub posts: i64,
+}
+
 #[derive(Serialize, Deserialize, FromRow, Clone)]
 pub struct Actor {
     pub id: String,
@@ -41,6 +49,12 @@ pub struct Actor {
     pub bio: Option<String>,
     pub status: Option<String>,
     pub public_key: String,
+}
+
+#[derive(Serialize, Deserialize, Clone)]
+pub struct Reaction {
+    pub emoji: String,
+    pub reactions: i64,
 }
 
 #[derive(Serialize, Deserialize, FromRow, Clone)]
@@ -53,6 +67,16 @@ pub struct Post {
     pub indexed_ts: i64,
     pub parent_id: Option<String>,
     pub signature: String,
+}
+
+#[derive(Serialize, Deserialize, Clone)]
+pub struct Thread {
+    pub post: Post,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub profile: Option<UserProfile>,
+    pub reactions: Vec<Reaction>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub children: Option<Vec<Thread>>,
 }
 
 #[derive(Serialize, Deserialize, Clone)]

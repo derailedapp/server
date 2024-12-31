@@ -18,9 +18,11 @@ use axum::{
     Json,
     extract::{Query, State},
 };
-use db_models::Post;
+use db_models::{Post, Thread};
 use serde::Deserialize;
 use sqlx::types::chrono;
+
+use crate::utils::get_thread;
 
 #[derive(Deserialize)]
 pub struct ScrollOptions {
@@ -31,15 +33,22 @@ pub struct ScrollOptions {
 pub async fn route(
     Query(options): Query<ScrollOptions>,
     State(state): State<crate::GSt>,
-) -> Result<Json<Vec<Post>>, crate::Error> {
+) -> Result<Json<Vec<Thread>>, crate::Error> {
     let ts = chrono::Utc::now().timestamp_millis();
     Ok(Json(
-        sqlx::query_as!(
-            Post,
-            "SELECT * FROM posts WHERE indexed_ts < $1 ORDER BY indexed_ts;",
-            &options.before_ts.unwrap_or(ts)
+        futures::future::join_all(
+            sqlx::query_as!(
+                Post,
+                "SELECT * FROM posts WHERE indexed_ts < $1 ORDER BY indexed_ts;",
+                &options.before_ts.unwrap_or(ts)
+            )
+            .fetch_all(&state.pg)
+            .await?
+            .into_iter()
+            .map(|post| get_thread(&state.pg, post, false)),
         )
-        .fetch_all(&state.pg)
-        .await?,
+        .await
+        .into_iter()
+        .collect::<Result<Vec<Thread>, crate::Error>>()?,
     ))
 }
