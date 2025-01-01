@@ -1,11 +1,11 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT id FROM posts WHERE id = $1",
+  "query": "SELECT DISTINCT emoji FROM track_reactions WHERE track_id = $1;",
   "describe": {
     "columns": [
       {
         "ordinal": 0,
-        "name": "id",
+        "name": "emoji",
         "type_info": "Text"
       }
     ],
@@ -18,5 +18,5 @@
       false
     ]
   },
-  "hash": "f57f5750103141963c05562fe48c5596b8da60acbc44fb0f3e830ff96760894f"
+  "hash": "1427b806c6ac3836d9af9b80d6a76f322111e30e22c016a806a9dcfb1e7104c6"
 }

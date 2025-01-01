@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT * FROM posts WHERE parent_id = $1;",
+  "query": "SELECT * FROM tracks WHERE parent_id = $1;",
   "describe": {
     "columns": [
       {
@@ -60,5 +60,5 @@
       false
     ]
   },
-  "hash": "46008a098a0a73ffa8ec524c67d6aafe7f98698fdc0df70385a933e154c5d212"
+  "hash": "51977e484b316c945d006a2af216926ea7625bd951a6e3061f2775ebbd429b43"
 }

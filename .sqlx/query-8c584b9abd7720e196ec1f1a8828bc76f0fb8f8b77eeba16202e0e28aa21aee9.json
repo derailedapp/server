@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "UPDATE posts SET author_id = NULL, content = $1 WHERE id = $2 AND author_id = $3 RETURNING id",
+  "query": "UPDATE tracks SET author_id = NULL, content = $1 WHERE id = $2 AND author_id = $3 RETURNING id",
   "describe": {
     "columns": [
       {
@@ -20,5 +20,5 @@
       false
     ]
   },
-  "hash": "66a8cad7042573353a0ea484eab4ee714ee66c7a082ea1becaf7fd90b34675d4"
+  "hash": "8c584b9abd7720e196ec1f1a8828bc76f0fb8f8b77eeba16202e0e28aa21aee9"
 }

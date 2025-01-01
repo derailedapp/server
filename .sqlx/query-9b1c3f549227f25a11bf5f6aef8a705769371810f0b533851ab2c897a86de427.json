@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT * FROM posts WHERE author_id = $1 ORDER BY indexed_ts DESC;",
+  "query": "SELECT * FROM tracks WHERE author_id = $1 AND parent_id IS NULL ORDER BY indexed_ts DESC;",
   "describe": {
     "columns": [
       {
@@ -60,5 +60,5 @@
       false
     ]
   },
-  "hash": "8814a9b818ee9308ce8ab653c617e7adedbebd4cebf57dba86328ff370dd2004"
+  "hash": "9b1c3f549227f25a11bf5f6aef8a705769371810f0b533851ab2c897a86de427"
 }

@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT * FROM posts WHERE id = $1",
+  "query": "SELECT * FROM tracks WHERE indexed_ts < $1 AND parent_id IS NULL ORDER BY indexed_ts DESC LIMIT 30;",
   "describe": {
     "columns": [
       {
@@ -46,7 +46,7 @@
     ],
     "parameters": {
       "Left": [
-        "Text"
+        "Int8"
       ]
     },
     "nullable": [
@@ -60,5 +60,5 @@
       false
     ]
   },
-  "hash": "b6019471ff1989ef2f0658b0b34e683fdc706751e2bb69043544c9a4d08b5ba0"
+  "hash": "635c95ec312ac574e4cde85ad64aa7d69648dc5b4f9e1cc458e23b8c5091dab6"
 }

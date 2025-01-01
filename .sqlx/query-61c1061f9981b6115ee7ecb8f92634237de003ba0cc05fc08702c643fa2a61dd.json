@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT COUNT(id) FROM posts WHERE author_id = $1;",
+  "query": "SELECT COUNT(user_id) FROM track_reactions WHERE track_id = $1;",
   "describe": {
     "columns": [
       {
@@ -18,5 +18,5 @@
       null
     ]
   },
-  "hash": "a6f15f378750c552bfb1e28842cf65f75774341aca5678faa9f74fd94138e7ac"
+  "hash": "61c1061f9981b6115ee7ecb8f92634237de003ba0cc05fc08702c643fa2a61dd"
 }
