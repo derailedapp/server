@@ -1,5 +1,5 @@
 [package]
-name = "api"
+name = "ekranoplan"
 version = "0.1.0"
 edition = "2024"
 
@@ -17,7 +17,7 @@ thiserror.workspace = true
 tower-http = {version = "0.6.2", features = ["cors"]}
 dotenvy = "0.15.7"
 serde.workspace = true
-db_models.workspace = true
+models.workspace = true
 vodozemac = "0.8.1"
 nanoid = "0.4.0"
 futures = "0.3.31"

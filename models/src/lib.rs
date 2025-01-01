@@ -37,7 +37,7 @@ pub struct UserProfile {
     pub actor: Actor,
     pub followed: i64,
     pub followers: i64,
-    pub posts: i64,
+    pub tracks: i64,
 }
 
 #[derive(Serialize, Deserialize, FromRow, Clone)]
@@ -58,7 +58,7 @@ pub struct Reaction {
 }
 
 #[derive(Serialize, Deserialize, FromRow, Clone)]
-pub struct Post {
+pub struct Track {
     pub id: String,
     pub r#type: i32,
     pub author_id: Option<String>,
@@ -71,7 +71,7 @@ pub struct Post {
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Thread {
-    pub post: Post,
+    pub track: Track,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub profile: Option<UserProfile>,
     pub reactions: Vec<Reaction>,

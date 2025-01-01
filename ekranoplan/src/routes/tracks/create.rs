@@ -15,7 +15,7 @@
 */
 
 use axum::{Json, extract::State, http::HeaderMap};
-use db_models::Post;
+use models::Track;
 use serde::Deserialize;
 use sqlx::types::chrono;
 
@@ -32,7 +32,7 @@ pub async fn route(
     map: HeaderMap,
     State(state): State<crate::GSt>,
     Json(model): Json<CreatePost>,
-) -> Result<Json<Post>, crate::Error> {
+) -> Result<Json<Track>, crate::Error> {
     let (actor, account) = get_user(&map, &state.key, &state.pg).await?;
 
     let pickle =
@@ -48,8 +48,8 @@ pub async fn route(
 
     // TODO: verify post id and return a prompt error
     Ok(Json(sqlx::query_as!(
-        Post,
-        "INSERT INTO posts (id, type, author_id, content, original_ts, indexed_ts, parent_id, signature) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *;",
+        Track,
+        "INSERT INTO tracks (id, type, author_id, content, original_ts, indexed_ts, parent_id, signature) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *;",
         id,
         0,
         actor.id,

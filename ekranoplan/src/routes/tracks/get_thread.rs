@@ -14,23 +14,25 @@
    limitations under the License.
 */
 
-use axum::routing::{get, post};
+use axum::{
+    Json,
+    extract::{Path, State},
+};
+use models::{Thread, Track};
 
-pub mod create;
-pub mod delete;
-pub mod get_thread;
-pub mod get_user;
-pub mod mark_viewed;
-pub mod scroll;
+use crate::utils::get_thread;
 
-pub fn router() -> axum::Router<crate::GSt> {
-    axum::Router::new()
-        .route("/users/:user_id/posts", get(get_user::route))
-        .route("/posts", post(create::route))
-        .route(
-            "/posts/:post_id",
-            get(get_thread::route).delete(delete::route),
-        )
-        .route("/posts/:post_id/mark", post(mark_viewed::route))
-        .route("/posts/scroll", get(scroll::route))
+pub async fn route(
+    State(state): State<crate::GSt>,
+    Path(thread_id): Path<String>,
+) -> Result<Json<Thread>, crate::Error> {
+    let post = sqlx::query_as!(Track, "SELECT * FROM tracks WHERE id = $1", thread_id)
+        .fetch_optional(&state.pg)
+        .await?;
+
+    if let Some(post) = post {
+        Ok(Json(get_thread(&state.pg, post, true).await?))
+    } else {
+        Err(crate::Error::TrackNotExist)
+    }
 }

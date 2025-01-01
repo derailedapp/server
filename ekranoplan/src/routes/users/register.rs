@@ -21,8 +21,8 @@ use argon2::{
     password_hash::{SaltString, rand_core::OsRng},
 };
 use axum::{Json, extract::State};
-use db_models::{Account, Actor, TokenResult};
 use jsonwebtoken::EncodingKey;
+use models::{Account, Actor, TokenResult};
 use serde::Deserialize;
 use serde_valid::Validate;
 use sqlx::types::chrono;
@@ -38,7 +38,7 @@ pub struct Register {
 pub async fn route(
     State(state): State<crate::GSt>,
     Json(model): Json<Register>,
-) -> Result<Json<db_models::TokenResult>, crate::Error> {
+) -> Result<Json<models::TokenResult>, crate::Error> {
     let mut tx = state.pg.begin().await?;
 
     let salt = SaltString::generate(&mut OsRng);

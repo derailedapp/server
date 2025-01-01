@@ -14,25 +14,16 @@
    limitations under the License.
 */
 
-use axum::{
-    Json,
-    extract::{Path, State},
-};
-use db_models::{Actor, UserProfile};
+use axum::{Json, extract::State, http::HeaderMap};
+use models::UserProfile;
 
-use crate::utils::get_profile;
+use crate::{auth::get_user, utils::get_profile};
 
 pub async fn route(
+    map: HeaderMap,
     State(state): State<crate::GSt>,
-    Path(other_user): Path<String>,
 ) -> Result<Json<UserProfile>, crate::Error> {
-    let user = sqlx::query_as!(Actor, "SELECT * FROM actors WHERE id = $1;", other_user)
-        .fetch_optional(&state.pg)
-        .await?;
+    let (actor, _) = get_user(&map, &state.key, &state.pg).await?;
 
-    if let Some(user) = user {
-        Ok(Json(get_profile(&state.pg, user).await?))
-    } else {
-        Err(crate::Error::UserNotFound)
-    }
+    Ok(Json(get_profile(&state.pg, actor).await?))
 }

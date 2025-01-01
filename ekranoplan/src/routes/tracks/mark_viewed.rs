@@ -18,21 +18,33 @@ use axum::{
     extract::{Path, State},
     http::HeaderMap,
 };
+use sqlx::types::chrono;
 
 use crate::auth::get_user;
 
 pub async fn route(
     map: HeaderMap,
     State(state): State<crate::GSt>,
-    Path(post_id): Path<String>,
+    Path(track_id): Path<String>,
 ) -> Result<String, crate::Error> {
     let (actor, _) = get_user(&map, &state.key, &state.pg).await?;
 
-    let post = sqlx::query!("UPDATE posts SET author_id = NULL, content = $1 WHERE id = $2 AND author_id = $3 RETURNING id", "", post_id, actor.id).fetch_optional(&state.pg).await?;
+    let post = sqlx::query!("SELECT id FROM tracks WHERE id = $1", track_id)
+        .fetch_optional(&state.pg)
+        .await?;
 
-    if post.is_some() {
+    if let Some(post) = post {
+        let time = chrono::Utc::now().timestamp_millis();
+        sqlx::query!(
+            "INSERT INTO viewed_tracks (track_id, user_id, at) VALUES ($1, $2, $3);",
+            post.id,
+            actor.id,
+            time
+        )
+        .execute(&state.pg)
+        .await?;
         Ok("".to_string())
     } else {
-        Err(crate::Error::PostNotExist)
+        Err(crate::Error::TrackNotExist)
     }
 }

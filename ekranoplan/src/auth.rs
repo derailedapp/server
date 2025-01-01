@@ -15,8 +15,8 @@
 */
 
 use axum::http::HeaderMap;
-use db_models::{Account, Actor};
 use jsonwebtoken::{DecodingKey, EncodingKey, Header, Validation, decode, encode};
+use models::{Account, Actor};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 

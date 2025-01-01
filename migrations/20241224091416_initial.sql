@@ -25,8 +25,8 @@ CREATE TABLE IF NOT EXISTS sessions (
     user_id TEXT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
     PRIMARY KEY (id, user_id)
 );
-CREATE TABLE IF NOT EXISTS posts (
-    -- abcde1234/post_id
+CREATE TABLE IF NOT EXISTS tracks (
+    -- abcde1234/track_id
     id TEXT NOT NULL PRIMARY KEY,
     -- 0: Thread
     -- 1: Repost
@@ -35,13 +35,13 @@ CREATE TABLE IF NOT EXISTS posts (
     content TEXT NOT NULL,
     original_ts BIGINT NOT NULL,
     indexed_ts BIGINT NOT NULL,
-    -- abcde1234/post_id
-    parent_id TEXT REFERENCES posts(id) ON DELETE CASCADE,
+    -- abcde1234/track_id
+    parent_id TEXT REFERENCES tracks(id) ON DELETE CASCADE,
     signature TEXT NOT NULL
 );
-CREATE TABLE IF NOT EXISTS post_reactions (
-    post_id TEXT NOT NULL REFERENCES posts(id),
+CREATE TABLE IF NOT EXISTS track_reactions (
+    track_id TEXT NOT NULL REFERENCES tracks(id),
     user_id TEXT NOT NULL REFERENCES actors(id),
     emoji TEXT NOT NULL,
-    PRIMARY KEY (post_id, user_id)
+    PRIMARY KEY (track_id, user_id)
 );

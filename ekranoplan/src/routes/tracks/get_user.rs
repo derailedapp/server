@@ -16,31 +16,22 @@
 
 use axum::{
     Json,
-    extract::{Query, State},
+    extract::{Path, State},
 };
-use db_models::{Post, Thread};
-use serde::Deserialize;
-use sqlx::types::chrono;
+use models::{Thread, Track};
 
 use crate::utils::get_thread;
 
-#[derive(Deserialize)]
-pub struct ScrollOptions {
-    #[serde(default)]
-    before_ts: Option<i64>,
-}
-
 pub async fn route(
-    Query(options): Query<ScrollOptions>,
     State(state): State<crate::GSt>,
+    Path(other_user): Path<String>,
 ) -> Result<Json<Vec<Thread>>, crate::Error> {
-    let ts = chrono::Utc::now().timestamp_millis();
     Ok(Json(
         futures::future::join_all(
             sqlx::query_as!(
-                Post,
-                "SELECT * FROM posts WHERE indexed_ts < $1 AND parent_id IS NULL ORDER BY indexed_ts DESC LIMIT 30;",
-                &options.before_ts.unwrap_or(ts)
+                Track,
+                "SELECT * FROM tracks WHERE author_id = $1 AND parent_id IS NULL ORDER BY indexed_ts DESC;",
+                other_user
             )
             .fetch_all(&state.pg)
             .await?

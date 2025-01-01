@@ -15,24 +15,24 @@
 */
 
 use axum::{
-    Json,
     extract::{Path, State},
+    http::HeaderMap,
 };
-use db_models::{Post, Thread};
 
-use crate::utils::get_thread;
+use crate::auth::get_user;
 
 pub async fn route(
+    map: HeaderMap,
     State(state): State<crate::GSt>,
-    Path(thread_id): Path<String>,
-) -> Result<Json<Thread>, crate::Error> {
-    let post = sqlx::query_as!(Post, "SELECT * FROM posts WHERE id = $1", thread_id)
-        .fetch_optional(&state.pg)
-        .await?;
+    Path(track_id): Path<String>,
+) -> Result<String, crate::Error> {
+    let (actor, _) = get_user(&map, &state.key, &state.pg).await?;
 
-    if let Some(post) = post {
-        Ok(Json(get_thread(&state.pg, post, true).await?))
+    let post = sqlx::query!("UPDATE tracks SET author_id = NULL, content = $1 WHERE id = $2 AND author_id = $3 RETURNING id", "", track_id, actor.id).fetch_optional(&state.pg).await?;
+
+    if post.is_some() {
+        Ok("".to_string())
     } else {
-        Err(crate::Error::PostNotExist)
+        Err(crate::Error::TrackNotExist)
     }
 }

@@ -87,30 +87,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "34ac096ce696dc2fcabef30516bb13c0a68a11d30131d3df6f04711467681b04"
 
 [[package]]
-name = "api"
-version = "0.1.0"
-dependencies = [
- "argon2",
- "axum",
- "axum_thiserror",
- "db_models",
- "dotenvy",
- "futures",
- "jsonwebtoken",
- "lazy_static",
- "mimalloc",
- "nanoid",
- "regex",
- "serde",
- "serde_valid",
- "sqlx",
- "thiserror 2.0.9",
- "tokio",
- "tower-http",
- "vodozemac",
-]
-
-[[package]]
 name = "argon2"
 version = "0.5.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -514,14 +490,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e8566979429cf69b49a5c740c60791108e86440e8be149bbea4fe54d2c32d6e2"
 
 [[package]]
-name = "db_models"
-version = "0.1.0"
-dependencies = [
- "serde",
- "sqlx",
-]
-
-[[package]]
 name = "der"
 version = "0.7.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -603,6 +571,30 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "60b1af1c220855b6ceac025d3f6ecdd2b7c4894bfe9cd9bda4fbb4bc7c0d4cf0"
 dependencies = [
  "serde",
+]
+
+[[package]]
+name = "ekranoplan"
+version = "0.1.0"
+dependencies = [
+ "argon2",
+ "axum",
+ "axum_thiserror",
+ "dotenvy",
+ "futures",
+ "jsonwebtoken",
+ "lazy_static",
+ "mimalloc",
+ "models",
+ "nanoid",
+ "regex",
+ "serde",
+ "serde_valid",
+ "sqlx",
+ "thiserror 2.0.9",
+ "tokio",
+ "tower-http",
+ "vodozemac",
 ]
 
 [[package]]
@@ -1347,6 +1339,14 @@ dependencies = [
  "libc",
  "wasi",
  "windows-sys 0.52.0",
+]
+
+[[package]]
+name = "models"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "sqlx",
 ]
 
 [[package]]

@@ -18,28 +18,21 @@ use axum::{
     Json,
     extract::{Path, State},
 };
-use db_models::{Post, Thread};
+use models::{Actor, UserProfile};
 
-use crate::utils::get_thread;
+use crate::utils::get_profile;
 
 pub async fn route(
     State(state): State<crate::GSt>,
     Path(other_user): Path<String>,
-) -> Result<Json<Vec<Thread>>, crate::Error> {
-    Ok(Json(
-        futures::future::join_all(
-            sqlx::query_as!(
-                Post,
-                "SELECT * FROM posts WHERE author_id = $1 AND parent_id IS NULL ORDER BY indexed_ts DESC;",
-                other_user
-            )
-            .fetch_all(&state.pg)
-            .await?
-            .into_iter()
-            .map(|post| get_thread(&state.pg, post, false)),
-        )
-        .await
-        .into_iter()
-        .collect::<Result<Vec<Thread>, crate::Error>>()?,
-    ))
+) -> Result<Json<UserProfile>, crate::Error> {
+    let user = sqlx::query_as!(Actor, "SELECT * FROM actors WHERE id = $1;", other_user)
+        .fetch_optional(&state.pg)
+        .await?;
+
+    if let Some(user) = user {
+        Ok(Json(get_profile(&state.pg, user).await?))
+    } else {
+        Err(crate::Error::UserNotFound)
+    }
 }

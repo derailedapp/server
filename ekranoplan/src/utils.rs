@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-use db_models::{Actor, Post, Reaction, Thread, UserProfile};
+use models::{Actor, Reaction, Thread, Track, UserProfile};
 use sqlx::PgPool;
 
 pub async fn get_profile(pg: &PgPool, actor: Actor) -> Result<UserProfile, crate::Error> {
@@ -31,8 +31,8 @@ pub async fn get_profile(pg: &PgPool, actor: Actor) -> Result<UserProfile, crate
     )
     .fetch_one(pg)
     .await?;
-    let posts = sqlx::query!(
-        "SELECT COUNT(id) FROM posts WHERE author_id = $1 AND parent_id IS NULL;",
+    let tracks = sqlx::query!(
+        "SELECT COUNT(id) FROM tracks WHERE author_id = $1 AND parent_id IS NULL;",
         &actor.id
     )
     .fetch_one(pg)
@@ -42,13 +42,13 @@ pub async fn get_profile(pg: &PgPool, actor: Actor) -> Result<UserProfile, crate
         actor,
         followed: followed_users.count.unwrap_or(0),
         followers: followers.count.unwrap_or(0),
-        posts: posts.count.unwrap_or(0),
+        tracks: tracks.count.unwrap_or(0),
     })
 }
 
-pub async fn get_reactions(pg: &PgPool, post: &Post) -> Result<Vec<Reaction>, crate::Error> {
+pub async fn get_reactions(pg: &PgPool, post: &Track) -> Result<Vec<Reaction>, crate::Error> {
     let emojis = sqlx::query!(
-        "SELECT DISTINCT emoji FROM post_reactions WHERE post_id = $1;",
+        "SELECT DISTINCT emoji FROM track_reactions WHERE track_id = $1;",
         &post.id
     )
     .fetch_all(pg)
@@ -57,7 +57,7 @@ pub async fn get_reactions(pg: &PgPool, post: &Post) -> Result<Vec<Reaction>, cr
     let mut reactions = Vec::with_capacity(emojis.len());
     for emoji in emojis {
         let emoji_c = sqlx::query!(
-            "SELECT COUNT(user_id) FROM post_reactions WHERE post_id = $1;",
+            "SELECT COUNT(user_id) FROM track_reactions WHERE track_id = $1;",
             &emoji.emoji
         )
         .fetch_one(pg)
@@ -73,16 +73,20 @@ pub async fn get_reactions(pg: &PgPool, post: &Post) -> Result<Vec<Reaction>, cr
 
 pub async fn get_thread(
     pg: &PgPool,
-    post: Post,
+    track: Track,
     get_children: bool,
 ) -> Result<Thread, crate::Error> {
     let children = if get_children {
-        // fetch a list of posts
-        let children = sqlx::query_as!(Post, "SELECT * FROM posts WHERE parent_id = $1;", &post.id)
-            .fetch_all(pg)
-            .await?;
+        // fetch a list of tracks
+        let children = sqlx::query_as!(
+            Track,
+            "SELECT * FROM tracks WHERE parent_id = $1;",
+            &track.id
+        )
+        .fetch_all(pg)
+        .await?;
 
-        // turn the posts into threads
+        // turn the tracks into threads
         let children = futures::future::join_all(
             children
                 .into_iter()
@@ -97,7 +101,7 @@ pub async fn get_thread(
         None
     };
 
-    let profile = if let Some(ref author_id) = post.author_id {
+    let profile = if let Some(ref author_id) = track.author_id {
         let user = sqlx::query_as!(Actor, "SELECT * FROM actors WHERE id = $1;", author_id)
             .fetch_one(pg)
             .await?;
@@ -105,10 +109,10 @@ pub async fn get_thread(
     } else {
         None
     };
-    let reactions = get_reactions(pg, &post).await?;
+    let reactions = get_reactions(pg, &track).await?;
 
     Ok(Thread {
-        post,
+        track,
         children,
         profile,
         reactions,

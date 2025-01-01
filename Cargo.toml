@@ -1,6 +1,6 @@
 [workspace]
 resolver = "1"
-members = ["api", "db_models"]
+members = ["ekranoplan", "models"]
 
 [workspace.dependencies]
 tokio = { version = "1.42.0", features = ["full"] }
@@ -15,4 +15,4 @@ sqlx = { version = "0.8.2", features = ["runtime-tokio", "tls-native-tls", "post
 thiserror = "2.0.9"
 serde = { version = "1.0.216", features = ["derive"] }
 
-db_models = { path = "./db_models" }
+models = { path = "./models" }

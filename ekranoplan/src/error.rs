@@ -67,7 +67,7 @@ pub enum Error {
     #[status(404)]
     UserNotFound,
 
-    #[error("Post does not exist")]
+    #[error("Track does not exist")]
     #[status(404)]
-    PostNotExist,
+    TrackNotExist,
 }
