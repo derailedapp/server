@@ -32,7 +32,7 @@ pub async fn get_profile(pg: &PgPool, actor: Actor) -> Result<UserProfile, crate
     .fetch_one(pg)
     .await?;
     let posts = sqlx::query!(
-        "SELECT COUNT(id) FROM posts WHERE author_id = $1;",
+        "SELECT COUNT(id) FROM posts WHERE author_id = $1 AND parent_id IS NULL;",
         &actor.id
     )
     .fetch_one(pg)

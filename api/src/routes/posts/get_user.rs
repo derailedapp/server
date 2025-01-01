@@ -30,7 +30,7 @@ pub async fn route(
         futures::future::join_all(
             sqlx::query_as!(
                 Post,
-                "SELECT * FROM posts WHERE author_id = $1 ORDER BY indexed_ts DESC;",
+                "SELECT * FROM posts WHERE author_id = $1 AND parent_id IS NULL ORDER BY indexed_ts DESC;",
                 other_user
             )
             .fetch_all(&state.pg)

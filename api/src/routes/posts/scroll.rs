@@ -39,7 +39,7 @@ pub async fn route(
         futures::future::join_all(
             sqlx::query_as!(
                 Post,
-                "SELECT * FROM posts WHERE indexed_ts < $1 ORDER BY indexed_ts;",
+                "SELECT * FROM posts WHERE indexed_ts < $1 AND parent_id IS NULL ORDER BY indexed_ts DESC LIMIT 30;",
                 &options.before_ts.unwrap_or(ts)
             )
             .fetch_all(&state.pg)
