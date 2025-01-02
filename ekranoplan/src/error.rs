@@ -55,6 +55,10 @@ pub enum Error {
     #[status(401)]
     Argon2Error,
 
+    #[error("Valid former password required")]
+    #[status(400)]
+    InvalidFormerPassword,
+
     #[error("User already followed")]
     #[status(400)]
     UserFollowed,

@@ -72,7 +72,6 @@ pub struct Track {
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Thread {
     pub track: Track,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub profile: Option<UserProfile>,
     pub reactions: Vec<Reaction>,
     #[serde(skip_serializing_if = "Option::is_none")]

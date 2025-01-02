@@ -17,6 +17,7 @@
 use axum::routing::{get, post};
 use sqlx::PgPool;
 
+pub mod edit;
 pub mod follow;
 pub mod login;
 pub mod me;
@@ -53,5 +54,5 @@ pub fn router() -> axum::Router<crate::GSt> {
             post(follow::route).delete(unfollow::route),
         )
         .route("/users/:user_id", get(profile::route))
-        .route("/users/@me", get(me::route))
+        .route("/users/@me", get(me::route).patch(edit::route))
 }
