@@ -15,17 +15,21 @@
 */
 
 use axum::{
-    Json,
-    extract::{Path, State},
+    extract::{Path, State}, http::HeaderMap, Json
 };
 use models::{Thread, Track};
 
-use crate::utils::get_thread;
+use crate::{auth::get_user, utils::get_thread};
 
 pub async fn route(
+    map: HeaderMap,
     State(state): State<crate::GSt>,
-    Path(other_user): Path<String>,
+    Path(mut other_user): Path<String>,
 ) -> Result<Json<Vec<Thread>>, crate::Error> {
+    if other_user == "@me" {
+        let (actor, _) = get_user(&map, &state.key, &state.pg).await?;
+        other_user = actor.id;
+    }
     Ok(Json(
         futures::future::join_all(
             sqlx::query_as!(
