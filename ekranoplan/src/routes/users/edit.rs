@@ -125,5 +125,7 @@ pub async fn route(
         .await?;
     }
 
+    tx.commit().await?;
+
     Ok(Json(get_profile(&state.pg, actor).await?))
 }
