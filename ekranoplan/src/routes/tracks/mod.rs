@@ -22,8 +22,10 @@ pub mod delete;
 pub mod get_thread;
 pub mod get_user;
 pub mod mark_viewed;
+pub mod react;
 pub mod scroll;
 pub mod unbookmark;
+pub mod unreact;
 
 pub fn router() -> axum::Router<crate::GSt> {
     axum::Router::new()
@@ -37,6 +39,10 @@ pub fn router() -> axum::Router<crate::GSt> {
         .route(
             "/tracks/:track_id/bookmark",
             post(bookmark::route).delete(unbookmark::route),
+        )
+        .route(
+            "/tracks/:track_id/react",
+            post(react::route).delete(unreact::route),
         )
         .route("/tracks/scroll", get(scroll::route))
 }

@@ -22,3 +22,4 @@ vodozemac = "0.8.1"
 nanoid = "0.4.0"
 futures = "0.3.31"
 mimalloc = { version = "*", features = ["secure"] }
+emojis = "0.6.4"

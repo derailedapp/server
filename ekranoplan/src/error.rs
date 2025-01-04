@@ -74,4 +74,16 @@ pub enum Error {
     #[error("Track does not exist")]
     #[status(404)]
     TrackNotExist,
+
+    #[error("Emoji is not supported")]
+    #[status(400)]
+    EmojiNotSupported,
+
+    #[error("Reaction does not exist")]
+    #[status(400)]
+    ReactionNotExist,
+
+    #[error("Reaction already exists")]
+    #[status(400)]
+    ReactionExists,
 }
