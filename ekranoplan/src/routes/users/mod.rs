@@ -14,13 +14,13 @@
    limitations under the License.
 */
 
-use axum::routing::{get, post};
+use axum::routing::{get, patch, post};
 use sqlx::PgPool;
 
+pub mod bookmarks;
 pub mod edit;
 pub mod follow;
 pub mod login;
-pub mod me;
 pub mod profile;
 pub mod register;
 pub mod unfollow;
@@ -54,5 +54,6 @@ pub fn router() -> axum::Router<crate::GSt> {
             post(follow::route).delete(unfollow::route),
         )
         .route("/users/:user_id", get(profile::route))
-        .route("/users/@me", get(me::route).patch(edit::route))
+        .route("/users/:user_id/bookmarks", get(bookmarks::route))
+        .route("/users/@me", patch(edit::route))
 }

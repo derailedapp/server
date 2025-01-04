@@ -16,12 +16,14 @@
 
 use axum::routing::{get, post};
 
+pub mod bookmark;
 pub mod create;
 pub mod delete;
 pub mod get_thread;
 pub mod get_user;
 pub mod mark_viewed;
 pub mod scroll;
+pub mod unbookmark;
 
 pub fn router() -> axum::Router<crate::GSt> {
     axum::Router::new()
@@ -32,5 +34,9 @@ pub fn router() -> axum::Router<crate::GSt> {
             get(get_thread::route).delete(delete::route),
         )
         .route("/tracks/:track_id/mark", post(mark_viewed::route))
+        .route(
+            "/tracks/:track_id/bookmark",
+            post(bookmark::route).delete(unbookmark::route),
+        )
         .route("/tracks/scroll", get(scroll::route))
 }

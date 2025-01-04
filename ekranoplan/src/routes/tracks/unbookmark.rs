@@ -14,16 +14,34 @@
    limitations under the License.
 */
 
-use axum::{Json, extract::State, http::HeaderMap};
-use models::UserProfile;
+use axum::{
+    extract::{Path, State},
+    http::HeaderMap,
+};
 
-use crate::{auth::get_user, utils::get_profile};
+use crate::auth::get_user;
 
 pub async fn route(
     map: HeaderMap,
     State(state): State<crate::GSt>,
-) -> Result<Json<UserProfile>, crate::Error> {
+    Path(track_id): Path<String>,
+) -> Result<String, crate::Error> {
     let (actor, _) = get_user(&map, &state.key, &state.pg).await?;
 
-    Ok(Json(get_profile(&state.pg, actor).await?))
+    let post = sqlx::query!("SELECT id FROM tracks WHERE id = $1", track_id)
+        .fetch_optional(&state.pg)
+        .await?;
+
+    if let Some(post) = post {
+        sqlx::query!(
+            "DELETE FROM track_bookmarks WHERE track_id = $1 AND user_id = $2;",
+            post.id,
+            actor.id
+        )
+        .execute(&state.pg)
+        .await?;
+        Ok("".to_string())
+    } else {
+        Err(crate::Error::TrackNotExist)
+    }
 }

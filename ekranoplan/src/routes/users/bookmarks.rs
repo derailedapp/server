@@ -19,33 +19,36 @@ use axum::{
     extract::{Path, State},
     http::HeaderMap,
 };
-use models::{Thread, Track};
+use models::{Actor, Bookmark};
 
-use crate::{auth::get_user, utils::get_thread};
+use crate::auth::get_user;
 
 pub async fn route(
     map: HeaderMap,
     State(state): State<crate::GSt>,
-    Path(mut other_user): Path<String>,
-) -> Result<Json<Vec<Thread>>, crate::Error> {
-    if other_user == "@me" {
-        let (actor, _) = get_user(&map, &state.key, &state.pg).await?;
-        other_user = actor.id;
-    }
-    Ok(Json(
-        futures::future::join_all(
-            sqlx::query_as!(
-                Track,
-                "SELECT * FROM tracks WHERE author_id = $1 AND parent_id IS NULL ORDER BY indexed_ts DESC;",
-                other_user
-            )
+    Path(other_user): Path<String>,
+) -> Result<Json<Vec<Bookmark>>, crate::Error> {
+    let user = if other_user == "@me" {
+        let (user, _) = get_user(&map, &state.key, &state.pg).await?;
+        Some(user)
+    } else {
+        sqlx::query_as!(Actor, "SELECT * FROM actors WHERE id = $1;", other_user)
+            .fetch_optional(&state.pg)
+            .await?
+    };
+
+    if let Some(user) = user {
+        let bookmarks = sqlx::query!("SELECT * FROM track_bookmarks WHERE user_id = $1", &user.id)
             .fetch_all(&state.pg)
             .await?
             .into_iter()
-            .map(|post| get_thread(&state.pg, post, false)),
-        )
-        .await
-        .into_iter()
-        .collect::<Result<Vec<Thread>, crate::Error>>()?,
-    ))
+            .map(|b| Bookmark {
+                track_id: b.track_id,
+                at: b.at,
+            })
+            .collect();
+        Ok(Json(bookmarks))
+    } else {
+        Err(crate::Error::UserNotFound)
+    }
 }

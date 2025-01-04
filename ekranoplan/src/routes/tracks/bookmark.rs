@@ -15,31 +15,36 @@
 */
 
 use axum::{
-    Json,
     extract::{Path, State},
     http::HeaderMap,
 };
-use models::{Actor, UserProfile};
+use sqlx::types::chrono;
 
-use crate::{auth::get_user, utils::get_profile};
+use crate::auth::get_user;
 
 pub async fn route(
     map: HeaderMap,
     State(state): State<crate::GSt>,
-    Path(other_user): Path<String>,
-) -> Result<Json<UserProfile>, crate::Error> {
-    let user = if other_user == "@me" {
-        let (user, _) = get_user(&map, &state.key, &state.pg).await?;
-        Some(user)
-    } else {
-        sqlx::query_as!(Actor, "SELECT * FROM actors WHERE id = $1;", other_user)
-            .fetch_optional(&state.pg)
-            .await?
-    };
+    Path(track_id): Path<String>,
+) -> Result<String, crate::Error> {
+    let (actor, _) = get_user(&map, &state.key, &state.pg).await?;
 
-    if let Some(user) = user {
-        Ok(Json(get_profile(&state.pg, user).await?))
+    let post = sqlx::query!("SELECT id FROM tracks WHERE id = $1", track_id)
+        .fetch_optional(&state.pg)
+        .await?;
+
+    if let Some(post) = post {
+        let time = chrono::Utc::now().timestamp_millis();
+        sqlx::query!(
+            "INSERT INTO track_bookmarks (track_id, user_id, at) VALUES ($1, $2, $3);",
+            post.id,
+            actor.id,
+            time
+        )
+        .execute(&state.pg)
+        .await?;
+        Ok("".to_string())
     } else {
-        Err(crate::Error::UserNotFound)
+        Err(crate::Error::TrackNotExist)
     }
 }

@@ -70,6 +70,12 @@ pub struct Track {
 }
 
 #[derive(Serialize, Deserialize, Clone)]
+pub struct Bookmark {
+    pub track_id: String,
+    pub at: i64,
+}
+
+#[derive(Serialize, Deserialize, Clone)]
 pub struct Thread {
     pub track: Track,
     pub profile: Option<UserProfile>,
