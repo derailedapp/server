@@ -75,6 +75,7 @@ pub async fn get_thread(
     pg: &PgPool,
     track: Track,
     get_children: bool,
+    me: &Option<Actor>,
 ) -> Result<Thread, crate::Error> {
     let children = if get_children {
         // fetch a list of tracks
@@ -90,7 +91,7 @@ pub async fn get_thread(
         let children = futures::future::join_all(
             children
                 .into_iter()
-                .map(|child| get_thread(pg, child, false)),
+                .map(|child| get_thread(pg, child, false, me)),
         )
         .await;
 
@@ -111,10 +112,37 @@ pub async fn get_thread(
     };
     let reactions = get_reactions(pg, &track).await?;
 
+    let (bookmarked, personal_reactions) = if let Some(user) = me {
+        let bookmarked = sqlx::query!(
+            "SELECT * FROM track_bookmarks WHERE user_id = $1 AND track_id = $2;",
+            user.id,
+            &track.id
+        )
+        .fetch_optional(pg)
+        .await?
+        .is_some();
+
+        let pers: Vec<String> = sqlx::query!(
+            "SELECT emoji FROM track_reactions WHERE user_id = $1 AND track_id = $2;",
+            user.id,
+            &track.id
+        )
+        .fetch_all(pg)
+        .await?
+        .into_iter()
+        .map(|reaction| reaction.emoji)
+        .collect();
+        (Some(bookmarked), Some(pers))
+    } else {
+        (None, None)
+    };
+
     Ok(Thread {
         track,
         children,
         profile,
         reactions,
+        bookmarked,
+        personal_reactions,
     })
 }

@@ -17,12 +17,13 @@
 use axum::{
     Json,
     extract::{Query, State},
+    http::HeaderMap,
 };
 use models::{Thread, Track};
 use serde::Deserialize;
 use sqlx::types::chrono;
 
-use crate::utils::get_thread;
+use crate::{auth::get_user, utils::get_thread};
 
 #[derive(Deserialize)]
 pub struct ScrollOptions {
@@ -31,9 +32,17 @@ pub struct ScrollOptions {
 }
 
 pub async fn route(
+    map: HeaderMap,
     Query(options): Query<ScrollOptions>,
     State(state): State<crate::GSt>,
 ) -> Result<Json<Vec<Thread>>, crate::Error> {
+    let user = if map.contains_key("authorization") {
+        let (user, _) = get_user(&map, &state.key, &state.pg).await?;
+        Some(user)
+    } else {
+        None
+    };
+
     let ts = chrono::Utc::now().timestamp_millis();
     Ok(Json(
         futures::future::join_all(
@@ -45,7 +54,7 @@ pub async fn route(
             .fetch_all(&state.pg)
             .await?
             .into_iter()
-            .map(|post| get_thread(&state.pg, post, false)),
+            .map(|post| get_thread(&state.pg, post, false, &user)),
         )
         .await
         .into_iter()

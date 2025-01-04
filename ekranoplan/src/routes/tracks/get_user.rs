@@ -28,10 +28,14 @@ pub async fn route(
     State(state): State<crate::GSt>,
     Path(mut other_user): Path<String>,
 ) -> Result<Json<Vec<Thread>>, crate::Error> {
-    if other_user == "@me" {
-        let (actor, _) = get_user(&map, &state.key, &state.pg).await?;
-        other_user = actor.id;
-    }
+    let user = if map.contains_key("authorization") || other_user == "@me" {
+        let (user, _) = get_user(&map, &state.key, &state.pg).await?;
+        other_user = user.id.clone();
+        Some(user)
+    } else {
+        None
+    };
+
     Ok(Json(
         futures::future::join_all(
             sqlx::query_as!(
@@ -42,7 +46,7 @@ pub async fn route(
             .fetch_all(&state.pg)
             .await?
             .into_iter()
-            .map(|post| get_thread(&state.pg, post, false)),
+            .map(|post| get_thread(&state.pg, post, false, &user)),
         )
         .await
         .into_iter()

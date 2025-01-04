@@ -81,6 +81,10 @@ pub struct Thread {
     pub profile: Option<UserProfile>,
     pub reactions: Vec<Reaction>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub bookmarked: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub personal_reactions: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub children: Option<Vec<Thread>>,
 }
 

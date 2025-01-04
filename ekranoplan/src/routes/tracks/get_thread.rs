@@ -17,21 +17,30 @@
 use axum::{
     Json,
     extract::{Path, State},
+    http::HeaderMap,
 };
 use models::{Thread, Track};
 
-use crate::utils::get_thread;
+use crate::{auth::get_user, utils::get_thread};
 
 pub async fn route(
+    map: HeaderMap,
     State(state): State<crate::GSt>,
     Path(thread_id): Path<String>,
 ) -> Result<Json<Thread>, crate::Error> {
+    let user = if map.contains_key("authorization") {
+        let (user, _) = get_user(&map, &state.key, &state.pg).await?;
+        Some(user)
+    } else {
+        None
+    };
+
     let post = sqlx::query_as!(Track, "SELECT * FROM tracks WHERE id = $1", thread_id)
         .fetch_optional(&state.pg)
         .await?;
 
     if let Some(post) = post {
-        Ok(Json(get_thread(&state.pg, post, true).await?))
+        Ok(Json(get_thread(&state.pg, post, true, &user).await?))
     } else {
         Err(crate::Error::TrackNotExist)
     }
