@@ -28,7 +28,7 @@ pub async fn route(
     State(state): State<crate::GSt>,
     Path(mut other_user): Path<String>,
 ) -> Result<Json<Vec<Thread>>, crate::Error> {
-    let user = if map.contains_key("authorization") || other_user == "@me" {
+    let user = if map.contains_key("authorization") && other_user == "@me" {
         let (user, _) = get_user(&map, &state.key, &state.pg).await?;
         other_user = user.id.clone();
         Some(user)
