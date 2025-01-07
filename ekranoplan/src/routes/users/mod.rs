@@ -24,6 +24,7 @@ pub mod login;
 pub mod profile;
 pub mod register;
 pub mod unfollow;
+pub mod get_self;
 
 pub async fn follow_exists(
     db: &PgPool,
@@ -47,13 +48,13 @@ pub async fn follow_exists(
 
 pub fn router() -> axum::Router<crate::GSt> {
     axum::Router::new()
-        .route("/users/create", post(register::route))
-        .route("/users/login", post(login::route))
+        .route("/create", post(register::route))
+        .route("/login", post(login::route))
         .route(
             "/users/:user_id/follow",
             post(follow::route).delete(unfollow::route),
         )
         .route("/users/:user_id", get(profile::route))
         .route("/users/:user_id/bookmarks", get(bookmarks::route))
-        .route("/users/@me", patch(edit::route))
+        .route("/users/@me", patch(edit::route).get(get_self::route))
 }
