@@ -42,6 +42,5 @@ CREATE TABLE IF NOT EXISTS tracks (
 CREATE TABLE IF NOT EXISTS track_reactions (
     track_id TEXT NOT NULL REFERENCES tracks(id),
     user_id TEXT NOT NULL REFERENCES actors(id),
-    emoji TEXT NOT NULL,
     PRIMARY KEY (track_id, user_id)
 );

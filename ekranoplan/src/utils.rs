@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-use models::{Actor, Reaction, Thread, Track, UserProfile};
+use models::{Actor, Thread, Track, UserProfile};
 use sqlx::PgPool;
 
 pub async fn get_profile(pg: &PgPool, actor: Actor) -> Result<UserProfile, crate::Error> {
@@ -44,31 +44,6 @@ pub async fn get_profile(pg: &PgPool, actor: Actor) -> Result<UserProfile, crate
         followers: followers.count.unwrap_or(0),
         tracks: tracks.count.unwrap_or(0),
     })
-}
-
-pub async fn get_reactions(pg: &PgPool, post: &Track) -> Result<Vec<Reaction>, crate::Error> {
-    let emojis = sqlx::query!(
-        "SELECT DISTINCT emoji FROM track_reactions WHERE track_id = $1;",
-        &post.id
-    )
-    .fetch_all(pg)
-    .await?;
-
-    let mut reactions = Vec::with_capacity(emojis.len());
-    for emoji in emojis {
-        let emoji_c = sqlx::query!(
-            "SELECT COUNT(user_id) FROM track_reactions WHERE track_id = $1;",
-            &emoji.emoji
-        )
-        .fetch_one(pg)
-        .await?;
-        reactions.push(Reaction {
-            emoji: emoji.emoji,
-            reactions: emoji_c.count.unwrap_or(0),
-        });
-    }
-
-    Ok(reactions)
 }
 
 pub async fn get_thread(
@@ -110,9 +85,11 @@ pub async fn get_thread(
     } else {
         None
     };
-    let reactions = get_reactions(pg, &track).await?;
+    let comments = sqlx::query!("SELECT COUNT(id) FROM tracks WHERE parent_id = $1;", track.id).fetch_one(pg).await?;
+    let likes = sqlx::query!("SELECT COUNT(user_id) FROM track_reactions WHERE track_id = $1;", track.id).fetch_one(pg).await?;
+    let bookmarks = sqlx::query!("SELECT COUNT(user_id) FROM track_bookmarks WHERE track_id = $1;", track.id).fetch_one(pg).await?;
 
-    let (bookmarked, personal_reactions) = if let Some(user) = me {
+    let (bookmarked, liked) = if let Some(user) = me {
         let bookmarked = sqlx::query!(
             "SELECT * FROM track_bookmarks WHERE user_id = $1 AND track_id = $2;",
             user.id,
@@ -122,17 +99,12 @@ pub async fn get_thread(
         .await?
         .is_some();
 
-        let pers: Vec<String> = sqlx::query!(
-            "SELECT emoji FROM track_reactions WHERE user_id = $1 AND track_id = $2;",
-            user.id,
-            &track.id
-        )
-        .fetch_all(pg)
-        .await?
-        .into_iter()
-        .map(|reaction| reaction.emoji)
-        .collect();
-        (Some(bookmarked), Some(pers))
+        let reaction = sqlx::query!(
+            "SELECT user_id FROM track_reactions WHERE track_id = $1 AND user_id = $2;",
+            &track.id,
+            user.id
+        ).fetch_optional(pg).await?;
+        (Some(bookmarked), Some(reaction.is_some()))
     } else {
         (None, None)
     };
@@ -141,8 +113,10 @@ pub async fn get_thread(
         track,
         children,
         profile,
-        reactions,
         bookmarked,
-        personal_reactions,
+        liked,
+        comments: comments.count.unwrap_or(0),
+        likes: likes.count.unwrap_or(0),
+        bookmarks: bookmarks.count.unwrap_or(0)
     })
 }

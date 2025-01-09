@@ -53,7 +53,7 @@ pub struct Actor {
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Reaction {
-    pub emoji: String,
+    pub r#type: i64,
     pub reactions: i64,
 }
 
@@ -79,11 +79,13 @@ pub struct Bookmark {
 pub struct Thread {
     pub track: Track,
     pub profile: Option<UserProfile>,
-    pub reactions: Vec<Reaction>,
+    pub likes: i64,
+    pub comments: i64,
+    pub bookmarks: i64,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub bookmarked: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub personal_reactions: Option<Vec<String>>,
+    pub liked: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub children: Option<Vec<Thread>>,
 }

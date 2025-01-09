@@ -15,29 +15,17 @@
 */
 
 use axum::{
-    Json,
     extract::{Path, State},
     http::HeaderMap,
 };
-use serde::Deserialize;
 
 use crate::auth::get_user;
-
-#[derive(Deserialize)]
-pub struct ReactData {
-    emoji: String,
-}
 
 pub async fn route(
     map: HeaderMap,
     State(state): State<crate::GSt>,
     Path(track_id): Path<String>,
-    Json(model): Json<ReactData>,
 ) -> Result<String, crate::Error> {
-    if emojis::get(&model.emoji).is_none() {
-        return Err(crate::Error::EmojiNotSupported);
-    }
-
     let (actor, _) = get_user(&map, &state.key, &state.pg).await?;
 
     let post = sqlx::query!("SELECT id FROM tracks WHERE id = $1", track_id)
@@ -46,20 +34,18 @@ pub async fn route(
 
     if let Some(post) = post {
         let existing_reaction = sqlx::query!(
-            "SELECT emoji FROM track_reactions WHERE track_id = $1 AND user_id = $2 AND emoji = $3;",
+            "SELECT user_id FROM track_reactions WHERE track_id = $1 AND user_id = $2;",
             post.id,
-            actor.id,
-            &model.emoji
+            actor.id
         )
             .fetch_optional(&state.pg)
             .await?;
 
         if existing_reaction.is_some() {
             sqlx::query!(
-                "DELETE FROM track_reactions WHERE track_id = $1 AND user_id = $2 AND emoji = $3;",
+                "DELETE FROM track_reactions WHERE track_id = $1 AND user_id = $2;",
                 post.id,
                 actor.id,
-                &model.emoji
             )
             .execute(&state.pg)
             .await?;
