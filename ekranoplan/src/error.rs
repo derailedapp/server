@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-use axum::http::header::ToStrError;
+use axum::{extract::multipart::MultipartError, http::header::ToStrError};
 
 #[derive(Debug, thiserror::Error, axum_thiserror::ErrorStatus)]
 #[allow(clippy::enum_variant_names)]
@@ -34,6 +34,18 @@ pub enum Error {
     #[error("Internal Server Error")]
     #[status(500)]
     ToStrError(#[from] ToStrError),
+
+    #[error("Internal Server Error")]
+    #[status(500)]
+    MultipartError(#[from] MultipartError),
+
+    #[error("Internal Server Error")]
+    #[status(500)]
+    ImageError(#[from] image::ImageError),
+
+    #[error("Internal Server Error")]
+    #[status(500)]
+    S3Error(#[from] s3::error::S3Error),
 
     #[error("Internal Server Error")]
     #[status(500)]
@@ -82,4 +94,8 @@ pub enum Error {
     #[error("Reaction already exists")]
     #[status(400)]
     ReactionExists,
+
+    #[error("Image type not supported")]
+    #[status(400)]
+    InvalidImageType,
 }

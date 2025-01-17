@@ -14,11 +14,7 @@
    limitations under the License.
 */
 
-use axum::{
-    Json,
-    extract::State,
-    http::HeaderMap,
-};
+use axum::{Json, extract::State, http::HeaderMap};
 use models::UserProfile;
 
 use crate::{auth::get_user, utils::get_profile};

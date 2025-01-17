@@ -22,3 +22,7 @@ vodozemac = "0.8.1"
 nanoid = "0.4.0"
 futures = "0.3.31"
 mimalloc = { version = "*", features = ["secure"] }
+s3-tokio = "0.39.4"
+image = "0.25.5"
+libcaesium = "0.17.1"
+snowdon = "0.2.0"

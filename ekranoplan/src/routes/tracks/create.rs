@@ -39,7 +39,7 @@ pub async fn route(
         vodozemac::olm::AccountPickle::from_encrypted(&account.pickle, &crate::PICKLE_KEY)?;
     let acc = vodozemac::olm::Account::from_pickle(pickle);
 
-    let id = nanoid::nanoid!();
+    let id = state.snow.generate().unwrap().to_string();
     let ts = chrono::Utc::now().timestamp_millis();
 
     let sig_fmt = format!("{}{}{}{}", &id, &actor.id, &ts, &model.content);

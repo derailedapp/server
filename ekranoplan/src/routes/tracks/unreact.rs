@@ -38,8 +38,8 @@ pub async fn route(
             post.id,
             actor.id
         )
-            .fetch_optional(&state.pg)
-            .await?;
+        .fetch_optional(&state.pg)
+        .await?;
 
         if existing_reaction.is_some() {
             sqlx::query!(

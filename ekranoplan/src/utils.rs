@@ -85,9 +85,24 @@ pub async fn get_thread(
     } else {
         None
     };
-    let comments = sqlx::query!("SELECT COUNT(id) FROM tracks WHERE parent_id = $1;", track.id).fetch_one(pg).await?;
-    let likes = sqlx::query!("SELECT COUNT(user_id) FROM track_reactions WHERE track_id = $1;", track.id).fetch_one(pg).await?;
-    let bookmarks = sqlx::query!("SELECT COUNT(user_id) FROM track_bookmarks WHERE track_id = $1;", track.id).fetch_one(pg).await?;
+    let comments = sqlx::query!(
+        "SELECT COUNT(id) FROM tracks WHERE parent_id = $1;",
+        track.id
+    )
+    .fetch_one(pg)
+    .await?;
+    let likes = sqlx::query!(
+        "SELECT COUNT(user_id) FROM track_reactions WHERE track_id = $1;",
+        track.id
+    )
+    .fetch_one(pg)
+    .await?;
+    let bookmarks = sqlx::query!(
+        "SELECT COUNT(user_id) FROM track_bookmarks WHERE track_id = $1;",
+        track.id
+    )
+    .fetch_one(pg)
+    .await?;
 
     let (bookmarked, liked) = if let Some(user) = me {
         let bookmarked = sqlx::query!(
@@ -103,7 +118,9 @@ pub async fn get_thread(
             "SELECT user_id FROM track_reactions WHERE track_id = $1 AND user_id = $2;",
             &track.id,
             user.id
-        ).fetch_optional(pg).await?;
+        )
+        .fetch_optional(pg)
+        .await?;
         (Some(bookmarked), Some(reaction.is_some()))
     } else {
         (None, None)
@@ -117,6 +134,6 @@ pub async fn get_thread(
         liked,
         comments: comments.count.unwrap_or(0),
         likes: likes.count.unwrap_or(0),
-        bookmarks: bookmarks.count.unwrap_or(0)
+        bookmarks: bookmarks.count.unwrap_or(0),
     })
 }

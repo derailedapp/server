@@ -44,6 +44,8 @@ pub struct UserProfile {
 pub struct Actor {
     pub id: String,
     // @vincentrps.example.com
+    pub avatar: Option<String>,
+    pub banner: Option<String>,
     pub handle: Option<String>,
     pub display_name: Option<String>,
     pub bio: Option<String>,

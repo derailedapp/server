@@ -5,7 +5,7 @@ members = ["ekranoplan", "models"]
 [workspace.dependencies]
 tokio = { version = "1.42.0", features = ["full"] }
 argon2 = "0.5.3"
-axum = { version = "0.7.9", features = ["ws", "macros"] }
+axum = { version = "0.7.9", features = ["ws", "macros", "multipart"] }
 axum_thiserror = "0.1.0"
 jsonwebtoken = "9.3.0"
 lazy_static = "1.5.0"

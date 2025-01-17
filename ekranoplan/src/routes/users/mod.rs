@@ -20,11 +20,12 @@ use sqlx::PgPool;
 pub mod bookmarks;
 pub mod edit;
 pub mod follow;
+pub mod get_self;
 pub mod login;
+pub mod new_assets;
 pub mod profile;
 pub mod register;
 pub mod unfollow;
-pub mod get_self;
 
 pub async fn follow_exists(
     db: &PgPool,
@@ -57,4 +58,5 @@ pub fn router() -> axum::Router<crate::GSt> {
         .route("/users/:user_id", get(profile::route))
         .route("/users/:user_id/bookmarks", get(bookmarks::route))
         .route("/users/@me", patch(edit::route).get(get_self::route))
+        .route("/users/@me/assets", patch(new_assets::route))
 }

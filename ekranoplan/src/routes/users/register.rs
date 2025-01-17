@@ -50,7 +50,7 @@ pub async fn route(
         .map_err(|_| crate::Error::FailedPasswordHash)?
         .to_string();
 
-    let user_id = nanoid::nanoid!();
+    let user_id = state.snow.generate().unwrap().to_string();
 
     let acc = vodozemac::olm::Account::new();
     let public_key = acc.ed25519_key().to_base64();
