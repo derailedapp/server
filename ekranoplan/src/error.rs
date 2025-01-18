@@ -51,6 +51,10 @@ pub enum Error {
     #[status(500)]
     FailedPasswordHash,
 
+    #[error("Internal Server Error")]
+    #[status(500)]
+    IdenticonError(#[from] identicon_rs::error::IdenticonError),
+
     #[error("Invalid Token")]
     #[status(401)]
     InvalidToken(#[from] jsonwebtoken::errors::Error),
@@ -98,4 +102,8 @@ pub enum Error {
     #[error("Image type not supported")]
     #[status(400)]
     InvalidImageType,
+
+    #[error("Image not found")]
+    #[status(400)]
+    ImageNotFound,
 }

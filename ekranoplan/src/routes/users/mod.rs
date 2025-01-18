@@ -14,9 +14,14 @@
    limitations under the License.
 */
 
-use axum::routing::{get, patch, post};
+use axum::{
+    extract::DefaultBodyLimit,
+    routing::{get, patch, post},
+};
 use sqlx::PgPool;
 
+pub mod avatar;
+pub mod banner;
 pub mod bookmarks;
 pub mod edit;
 pub mod follow;
@@ -56,7 +61,10 @@ pub fn router() -> axum::Router<crate::GSt> {
             post(follow::route).delete(unfollow::route),
         )
         .route("/users/:user_id", get(profile::route))
+        .route("/users/:user_id/avatar", get(avatar::route))
+        .route("/users/:user_id/banner", get(banner::route))
         .route("/users/:user_id/bookmarks", get(bookmarks::route))
         .route("/users/@me", patch(edit::route).get(get_self::route))
         .route("/users/@me/assets", patch(new_assets::route))
+        .layer(DefaultBodyLimit::max(14_680_064))
 }
