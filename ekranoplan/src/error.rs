@@ -14,6 +14,11 @@
    limitations under the License.
 */
 
+use std::{
+    io::{self, IntoInnerError},
+    string::FromUtf8Error,
+};
+
 use axum::{extract::multipart::MultipartError, http::header::ToStrError};
 
 #[derive(Debug, thiserror::Error, axum_thiserror::ErrorStatus)]
@@ -54,6 +59,22 @@ pub enum Error {
     #[error("Internal Server Error")]
     #[status(500)]
     IdenticonError(#[from] identicon_rs::error::IdenticonError),
+
+    #[error("Internal Server Error")]
+    #[status(500)]
+    UTF8Error(#[from] FromUtf8Error),
+
+    #[error("Internal Server Error")]
+    #[status(500)]
+    BufWriterError(#[from] IntoInnerError<Vec<u8>>),
+
+    #[error("Internal Server Error")]
+    #[status(500)]
+    CBORError(#[from] ciborium::ser::Error<io::Error>),
+
+    #[error("Internal Server Error")]
+    #[status(500)]
+    SendError,
 
     #[error("Invalid Token")]
     #[status(401)]

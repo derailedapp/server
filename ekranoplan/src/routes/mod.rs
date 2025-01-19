@@ -16,9 +16,11 @@
 
 pub mod tracks;
 pub mod users;
+pub mod x15;
 
 pub fn router() -> axum::Router<crate::GSt> {
     axum::Router::new()
         .merge(users::router())
         .merge(tracks::router())
+        .merge(x15::router())
 }

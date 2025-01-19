@@ -24,14 +24,29 @@ mod utils;
 
 use error::Error;
 use s3::{Bucket, creds::Credentials};
+use serde::Serialize;
 use snow::SnowflakeGenerator;
-use std::{env, sync::Arc, time::Duration};
+use std::{collections::HashMap, env, sync::Arc, time::Duration};
 
-use axum::http::Method;
+use axum::{http::Method, response::sse::Event};
 use mimalloc::MiMalloc;
 use sqlx::{PgPool, postgres::PgPoolOptions};
-use tokio::net::TcpListener;
+use tokio::{
+    net::TcpListener,
+    sync::{RwLock, mpsc},
+};
 use tower_http::cors::{Any, CorsLayer};
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(tag = "t", content = "d")]
+pub enum X15Message {
+    Ready {
+        actor: models::Actor,
+        account: models::Account,
+    },
+}
+
+type ConsumantsMap = HashMap<String, Vec<mpsc::Sender<Result<Event, crate::Error>>>>;
 
 #[derive(Debug, Clone)]
 pub struct GSt {
@@ -40,6 +55,7 @@ pub struct GSt {
     pub avatars: Bucket,
     pub banners: Bucket,
     pub snow: Arc<SnowflakeGenerator>,
+    pub consumants: Arc<RwLock<ConsumantsMap>>,
 }
 
 pub const PICKLE_KEY: [u8; 32] = [0u8; 32];
@@ -108,6 +124,7 @@ async fn main() {
             avatars,
             banners,
             snow: Arc::new(snow::SnowflakeGenerator::default()),
+            consumants: Arc::new(RwLock::new(HashMap::new())),
         });
 
     let listener = TcpListener::bind("0.0.0.0:24650").await.unwrap();

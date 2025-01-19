@@ -14,6 +14,9 @@
    limitations under the License.
 */
 
+use std::io::BufWriter;
+
+use axum::response::sse::Event;
 use models::{Actor, Thread, Track, UserProfile};
 use sqlx::PgPool;
 
@@ -136,4 +139,10 @@ pub async fn get_thread(
         likes: likes.count.unwrap_or(0),
         bookmarks: bookmarks.count.unwrap_or(0),
     })
+}
+
+pub fn get_event(data: crate::X15Message) -> Result<Event, crate::Error> {
+    let mut writer = BufWriter::new(Vec::new());
+    ciborium::into_writer(&data, &mut writer)?;
+    Ok(Event::default().data(String::from_utf8(writer.buffer().to_vec())?))
 }

@@ -17,7 +17,7 @@
 use serde::{Deserialize, Serialize};
 use sqlx::prelude::FromRow;
 
-#[derive(Serialize, Deserialize, FromRow, Clone)]
+#[derive(Debug, Serialize, Deserialize, FromRow, Clone)]
 pub struct Account {
     pub id: String,
     #[sqlx(default)]
@@ -32,7 +32,7 @@ pub struct Account {
     pub pickle: String,
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct UserProfile {
     pub actor: Actor,
     pub followed: i64,
@@ -40,7 +40,7 @@ pub struct UserProfile {
     pub tracks: i64,
 }
 
-#[derive(Serialize, Deserialize, FromRow, Clone)]
+#[derive(Debug, Serialize, Deserialize, FromRow, Clone)]
 pub struct Actor {
     pub id: String,
     // @vincentrps.example.com
@@ -53,13 +53,13 @@ pub struct Actor {
     pub public_key: String,
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Reaction {
     pub r#type: i64,
     pub reactions: i64,
 }
 
-#[derive(Serialize, Deserialize, FromRow, Clone)]
+#[derive(Debug, Serialize, Deserialize, FromRow, Clone)]
 pub struct Track {
     pub id: String,
     pub r#type: i32,
@@ -71,13 +71,13 @@ pub struct Track {
     pub signature: String,
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Bookmark {
     pub track_id: String,
     pub at: i64,
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Thread {
     pub track: Track,
     pub profile: Option<UserProfile>,
@@ -92,7 +92,7 @@ pub struct Thread {
     pub children: Option<Vec<Thread>>,
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct TokenResult {
     pub actor: Actor,
     pub account: Account,
