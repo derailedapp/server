@@ -14,15 +14,6 @@
    limitations under the License.
 */
 
-pub mod rooms;
-pub mod tracks;
-pub mod users;
-pub mod x15;
-
 pub fn router() -> axum::Router<crate::GSt> {
     axum::Router::new()
-        .merge(rooms::router())
-        .merge(users::router())
-        .merge(tracks::router())
-        .merge(x15::router())
 }

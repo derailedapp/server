@@ -43,6 +43,15 @@ pub enum X15Message {
     Ready {
         actor: models::Actor,
         account: models::Account,
+        channels: Vec<models::Channel>,
+    },
+    RoomCreate {
+        room: models::Room,
+        members: Vec<models::Actor>,
+    },
+    MessageCreate {
+        room_id: String,
+        msg: models::Message,
     },
 }
 

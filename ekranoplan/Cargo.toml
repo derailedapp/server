@@ -29,3 +29,4 @@ snowdon = "0.2.0"
 identicon-rs = "6.0.1"
 tokio-stream = { version = "0.1.17", features = ["sync"] }
 ciborium = "0.2.2"
+blake3 = "1.5.5"

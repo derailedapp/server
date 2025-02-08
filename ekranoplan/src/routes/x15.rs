@@ -23,10 +23,14 @@ use axum::{
     routing::get,
 };
 use futures::Stream;
+use models::Channel;
 use tokio::sync::mpsc;
 use tokio_stream::wrappers::ReceiverStream;
 
-use crate::{auth::get_user, utils::get_event};
+use crate::{
+    auth::get_user,
+    utils::{get_channel, get_event},
+};
 
 pub fn router() -> axum::Router<crate::GSt> {
     axum::Router::new().route("/x15", get(x15_handler))
@@ -37,15 +41,38 @@ pub async fn x15_handler(
     State(state): State<crate::GSt>,
 ) -> Result<Sse<impl Stream<Item = Result<Event, crate::Error>>>, crate::Error> {
     let (actor, account) = get_user(&map, &state.key, &state.pg).await?;
+    let rooms = sqlx::query_as!(
+        models::Room,
+        "SELECT * FROM rooms WHERE id IN (SELECT room_id FROM room_members WHERE actor_id = $1);",
+        actor.id
+    )
+    .fetch_all(&state.pg)
+    .await?;
+    let channels = futures::future::join_all(
+        rooms
+            .into_iter()
+            .map(|room| get_channel(&state.pg, room, Some(&actor))),
+    )
+    .await;
+
+    // turn channels from Vec<Result<_, Error>> to Result<Vec<_>, Error>
+    let channels: Result<Vec<Channel>, crate::Error> = channels.into_iter().collect();
+    let channels = channels?;
 
     let stream = {
         let (sender, stream) = mpsc::channel(3_000);
         let mut consumants = state.consumants.write().await;
         if let Some(cons) = consumants.get_mut(&actor.id) {
             cons.push(sender.clone());
+        } else {
+            consumants.insert(actor.id.clone(), vec![sender.clone()]);
         }
         sender
-            .send(get_event(crate::X15Message::Ready { actor, account }))
+            .send(get_event(crate::X15Message::Ready {
+                actor,
+                account,
+                channels,
+            }))
             .await
             .map_err(|_| crate::Error::SendError)?;
         stream

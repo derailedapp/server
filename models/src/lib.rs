@@ -98,3 +98,43 @@ pub struct TokenResult {
     pub account: Account,
     pub token: String,
 }
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct Channel {
+    pub room: Room,
+    pub members: Vec<Actor>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub state: Option<ReadState>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct Room {
+    pub id: String,
+    pub name: Option<String>,
+    pub r#type: i32,
+    pub last_message_id: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct RoomMember {
+    pub room_id: String,
+    pub actor_id: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct Message {
+    pub id: String,
+    pub room_id: String,
+    pub author_id: Option<String>,
+    pub content: String,
+    pub timestamp: i64,
+    pub edited_timestamp: Option<i64>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct ReadState {
+    pub room_id: String,
+    pub user_id: String,
+    pub last_message_id: Option<String>,
+    pub mentions: i32,
+}
